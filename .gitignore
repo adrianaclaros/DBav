@@ -1,0 +1,20 @@
+# Environment and dependencies
+.env
+node_modules/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

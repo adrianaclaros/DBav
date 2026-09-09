@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salteñas Intiña | Pedidos</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="login-view" class="login-layout">
+      <section class="login-card">
+        <img class="login-logo" src="assets/logo.png" alt="Logotipo Intiña" />
+        <p class="eyebrow">Salteñas Intiña</p>
+        <h1>Iniciar sesión</h1>
+        <p class="subtitle">Accede al sistema de registro de pedidos.</p>
+        <form id="login-form">
+          <label for="email">Correo electrónico</label>
+          <input id="email" name="email" type="email" autocomplete="email" required />
+          <label for="password">Contraseña</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" minlength="6" required />
+          <button type="submit">Ingresar</button>
+        </form>
+        <p id="feedback" class="feedback" role="alert" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <main id="dashboard-view" class="app-shell" hidden>
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Inicio de Salteñas Intiña"><span class="brand-mark">C</span><span>INTIÑA</span></a>
+        <div class="user-menu"><span id="user-email" class="user-email"></span><button id="logout-button" class="button-secondary" type="button">Cerrar sesión</button></div>
+      </header>
+      <section class="page-header">
+        <div><p class="eyebrow">Mostrador</p><h1>Registrar pedido</h1><p class="subtitle">Selecciona los productos para la venta actual.</p></div>
+        <div class="order-number"><span>Pedido actual</span><strong id="order-number">#001</strong></div>
+      </section>
+      <section class="sales-layout" aria-label="Registro de pedidos">
+        <section class="panel catalog-panel">
+          <div class="panel-heading">
+            <div><h2>Productos disponibles</h2><p>Agrega productos al pedido.</p></div>
+            <label class="search-field" for="product-search"><span aria-hidden="true">⌕</span><input id="product-search" type="search" placeholder="Buscar producto" /></label>
+          </div>
+          <div id="product-list" class="product-grid" aria-live="polite"></div>
+        </section>
+        <aside class="panel order-panel">
+          <div class="panel-heading compact"><div><h2>Resumen del pedido</h2><p id="item-count">Sin productos agregados</p></div><button id="clear-order" class="icon-button" type="button" title="Vaciar pedido" aria-label="Vaciar pedido">🗑</button></div>
+          <div id="order-items" class="order-items"><p class="empty-state">Aún no agregaste productos al pedido.</p></div>
+          <div class="order-total"><span>Total</span><strong id="order-total">Bs 0,00</strong></div>
+          <div class="checkout-fields">
+            <label for="payment-method">Método de pago</label>
+            <select id="payment-method"><option value="Efectivo">Efectivo</option><option value="QR">QR</option><option value="Tarjeta">Tarjeta</option></select>
+            <details class="invoice-details"><summary>Agregar datos de facturación</summary><div class="invoice-inputs"><label for="nit">NIT</label><input id="nit" type="text" maxlength="20" placeholder="Opcional" /><label for="business-name">Razón social</label><input id="business-name" type="text" maxlength="100" placeholder="Opcional" /></div></details>
+          </div>
+          <button id="complete-order" class="button-primary" type="button">Registrar venta</button>
+          <p id="order-feedback" class="order-feedback" role="status" aria-live="polite"></p>
+        </aside>
+      </section>
+    </main>
+    <script src="config.js"></script><script src="app.js"></script>
+  </body>
+</html>
