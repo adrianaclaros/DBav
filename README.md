@@ -1,6 +1,6 @@
-# Salteñas Cuzque
+# Salteñas Intiña
 
-Aplicacion full stack para la salteñeria Salteñas Cuzque. El proyecto incorpora autenticacion de usuarios para el proceso de registro de pedidos de mostrador, cuyo modelo de datos existente contempla productos, ventas y sus detalles.
+Aplicacion full stack para la salteñeria Salteñas Intiña. El proyecto incorpora autenticacion de usuarios para el proceso de registro de pedidos de mostrador, cuyo modelo de datos existente contempla productos, ventas y sus detalles.
 
 ## Estudiante
 
