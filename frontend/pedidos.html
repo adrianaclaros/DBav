@@ -8,52 +8,105 @@
   </head>
   <body>
     <main class="app-shell">
+      <!-- Barra Superior -->
       <header class="topbar">
-	<img 
-    		class="topbar-image" 
-    		src="assets/banner.png" 
-    		alt=""
-  	/>
-        <a class="brand" href="pedidos.html" aria-label="Inicio de Salteñas Intiña"><span class="brand-mark">I</span><span>INTIÑA</span></a>
-        <div class="user-menu"><span id="user-email" class="user-email"></span><button id="logout-button" class="button-secondary" type="button">Cerrar sesión</button></div>
+        <img class="topbar-image" src="assets/banner.png" alt="Banner Salteñería Initiña" />
+        <a class="brand" href="pedidos.html" aria-label="Inicio de Salteñas Intiña">
+          <span class="brand-mark">I</span>
+          <span>INTIÑA</span>
+        </a>
+        <div class="user-menu">
+          <span id="user-email" class="user-email"></span>
+          <button id="logout-button" class="button-secondary" type="button">Cerrar sesión</button>
+        </div>
       </header>
+
+      <!-- Encabezado de Página -->
       <section class="page-header">
-        <div><p class="eyebrow">Mostrador</p><h1>Registrar pedido</h1><p class="subtitle">Selecciona los productos para la venta actual.</p></div>
-        <div class="order-number"><span>Pedido actual</span><strong id="order-number">#001</strong></div>
+        <div>
+          <p class="eyebrow">Mostrador</p>
+          <h1>Registrar pedido</h1>
+          <p class="subtitle">Selecciona los productos para la venta actual.</p>
+        </div>
+        <div class="order-number">
+          <span>Pedido actual</span>
+          <strong id="order-number">#001</strong>
+        </div>
       </section>
+
+      <!-- Layout de Ventas -->
       <section class="sales-layout" aria-label="Registro de pedidos">
+        <!-- Catálogo de Productos -->
         <section class="panel catalog-panel">
-<div class="panel-heading">
-  <div>
-    <h2>Productos disponibles</h2>
-    <p>Selecciona tu pedido.</p>
-  </div>
+          <div class="panel-heading">
+            <div>
+              <h2>Productos disponibles</h2>
+              <p>Selecciona tu pedido.</p>
+            </div>
 
-  <label class="search-field" for="product-search">
-    <span aria-hidden="true">⌕</span>
-    <input id="product-search" type="search" placeholder="Buscar producto" />
-  </label>
-</div>
+            <label class="search-field" for="product-search">
+              <span aria-hidden="true">⌕</span>
+              <input id="product-search" type="search" placeholder="Buscar producto" />
+            </label>
+          </div>
 
-<div class="product-filters">
-  <button type="button" class="filter-button active" data-filter="todos">Todos</button>
-  <button type="button" class="filter-button" data-filter="saltenas">Salteñas</button>
-  <button type="button" class="filter-button" data-filter="masas">Masas</button>
-  <button type="button" class="filter-button" data-filter="bebidas">Bebidas</button>
-</div>
+          <div class="product-filters">
+            <button type="button" class="filter-button active" data-filter="todos">Todos</button>
+            <button type="button" class="filter-button" data-filter="saltenas">Salteñas</button>
+            <button type="button" class="filter-button" data-filter="masas">Masas</button>
+            <button type="button" class="filter-button" data-filter="bebidas">Bebidas</button>
+          </div>
 
-<div id="product-list" class="product-grid" aria-live="polite"></div>
+          <div id="product-list" class="product-grid" aria-live="polite"></div>
         </section>
+
+        <!-- Resumen de Orden -->
         <aside class="panel order-panel">
-          <div class="panel-heading compact"><div><h2>Resumen del pedido</h2><p id="item-count">Sin productos agregados</p></div><button id="clear-order" class="icon-button" type="button" title="Vaciar pedido" aria-label="Vaciar pedido">🗑</button></div>
-          <div id="order-items" class="order-items"><p class="empty-state">Aún no agregaste productos al pedido.</p></div>
-          <div class="order-total"><span>Total</span><strong id="order-total">Bs 0,00</strong></div>
-          <div class="checkout-fields"><label for="payment-method">Método de pago</label><select id="payment-method"><option value="Efectivo">Efectivo</option><option value="QR">QR</option><option value="Tarjeta">Tarjeta</option></select><details class="invoice-details"><summary>Agregar datos de facturación</summary><div class="invoice-inputs"><label for="nit">NIT</label><input id="nit" type="text" maxlength="20" placeholder="Opcional" /><label for="business-name">Razón social</label><input id="business-name" type="text" maxlength="100" placeholder="Opcional" /></div></details></div>
+          <div class="panel-heading compact">
+            <div>
+              <h2>Resumen del pedido</h2>
+              <p id="item-count">Sin productos agregados</p>
+            </div>
+            <button id="clear-order" class="icon-button" type="button" title="Vaciar pedido" aria-label="Vaciar pedido">🗑</button>
+          </div>
+
+          <div id="order-items" class="order-items">
+            <p class="empty-state">Aún no agregaste productos al pedido.</p>
+          </div>
+
+          <div class="order-total">
+            <span>Total</span>
+            <strong id="order-total">Bs 0,00</strong>
+          </div>
+
+          <div class="checkout-fields">
+            <label for="payment-method">Método de pago</label>
+            <select id="payment-method">
+              <option value="Efectivo">Efectivo</option>
+              <option value="QR">QR</option>
+              <option value="Tarjeta">Tarjeta</option>
+            </select>
+
+            <details class="invoice-details">
+              <summary>Agregar datos de facturación</summary>
+              <div class="invoice-inputs">
+                <label for="nit">NIT</label>
+                <input id="nit" type="text" maxlength="20" placeholder="Opcional" />
+                
+                <label for="business-name">Razón social</label>
+                <input id="business-name" type="text" maxlength="100" placeholder="Opcional" />
+              </div>
+            </details>
+          </div>
+
           <button id="complete-order" class="button-primary" type="button">Registrar venta</button>
           <p id="order-feedback" class="order-feedback" role="status" aria-live="polite"></p>
         </aside>
       </section>
     </main>
-    <script src="config.js"></script><script src="pedido.js"></script>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="pedido.js"></script>
   </body>
 </html>
