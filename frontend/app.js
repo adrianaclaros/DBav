@@ -40,7 +40,7 @@ function showDashboard(email) {
 function showLogin(message = '') {
   dashboardView.hidden = true;
   loginView.hidden = false;
-  document.title = 'Salteñas Cuzque | Acceso';
+  document.title = 'Salteñas Intiña | Acceso';
   showFeedback(message);
 }
 

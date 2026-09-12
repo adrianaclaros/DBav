@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Salteñas Intiña | Pedidos</title>
+    <link rel="icon" type="image/png" href="assets/imagotipo.png">
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -11,10 +12,10 @@
       <!-- Barra Superior -->
       <header class="topbar">
         <img class="topbar-image" src="assets/banner.png" alt="Banner Salteñería Initiña" />
-        <a class="brand" href="pedidos.html" aria-label="Inicio de Salteñas Intiña">
-          <span class="brand-mark">I</span>
-          <span>INTIÑA</span>
-        </a>
+        <a class="brand" href="pedidos.html" aria-label="Inicio de Salteñería Intiña">
+   	  <img class="brand-logo" src="assets/imagotipo.png" alt="Logo Intiña" />
+  	  <span>INTIÑA</span>
+	</a>
         <div class="user-menu">
           <span id="user-email" class="user-email"></span>
           <button id="logout-button" class="button-secondary" type="button">Cerrar sesión</button>
@@ -24,14 +25,13 @@
       <!-- Encabezado de Página -->
       <section class="page-header">
         <div>
-          <p class="eyebrow">Mostrador</p>
           <h1>Registrar pedido</h1>
           <p class="subtitle">Selecciona los productos para la venta actual.</p>
         </div>
         <div class="order-number">
-          <span>Pedido actual</span>
-          <strong id="order-number">#001</strong>
-        </div>
+	  <span>Pedido actual:</span>
+	  <strong id="order-number">#001</strong>
+	</div>
       </section>
 
       <!-- Layout de Ventas -->
@@ -104,6 +104,76 @@
         </aside>
       </section>
     </main>
+
+    <!-- VENTANA EMERGENTE DE FACTURA -->
+    <div id="invoice-modal" class="invoice-modal" hidden>
+      <div class="invoice-overlay" id="invoice-overlay"></div>
+      <section class="invoice-window" role="dialog" aria-modal="true" aria-labelledby="invoice-title">
+        
+        <!-- BARRA DE ACCIONES ARRIBA (IMPRIMIR + CERRAR) -->
+        <div class="invoice-actions">
+          <button id="print-invoice" class="invoice-print-btn" type="button" onclick="window.print()" title="Imprimir comanda/factura">🖨️</button>
+          <button id="close-invoice" class="invoice-close" type="button" aria-label="Cerrar factura">×</button>
+        </div>
+
+        <div class="invoice-header">
+          <img src="assets/imagotipo.png" alt="Intiña" class="invoice-logo" />
+          <div>
+            <h2 id="invoice-title">SALTEÑERÍA INTIÑA</h2>
+            <p>Comprobante de venta</p>
+          </div>
+        </div>
+        
+        <div class="invoice-divider"></div>
+        
+        <div class="invoice-info">
+          <div>
+            <span>Pedido</span>
+            <strong id="invoice-order-number">#001</strong>
+          </div>
+          <div>
+            <span>Fecha</span>
+            <strong id="invoice-date"></strong>
+          </div>
+        </div>
+        
+        <div class="invoice-divider"></div>
+
+        <div class="invoice-table-header">
+          <span>DESCRIPCIÓN</span>
+          <span>CANT.</span>
+          <span>P.UNIT.</span>
+          <span>SUBTOTAL</span>
+        </div>
+        
+        <div id="invoice-items" class="invoice-items"></div>
+        
+        <div class="invoice-total">
+          <span>TOTAL</span>
+          <strong id="invoice-total">Bs 0,00</strong>
+        </div>
+        
+        <div class="invoice-payment">
+          <p>
+            <span>Método de pago</span>
+            <strong id="invoice-payment-method">Efectivo</strong>
+          </p>
+          <p>
+            <span>NIT</span>
+            <strong id="invoice-nit">—</strong>
+          </p>
+          <p>
+            <span>Razón social</span>
+            <strong id="invoice-business-name">—</strong>
+          </p>
+        </div>
+        
+        <div class="invoice-footer">
+          <p>¡Gracias por su compra!</p>
+          <small>Salteñería Intiña</small>
+        </div>
+      </section>
+    </div>
 
     <!-- Scripts -->
     <script src="config.js"></script>

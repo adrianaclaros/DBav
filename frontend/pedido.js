@@ -31,6 +31,19 @@ const completeOrderButton = document.querySelector('#complete-order');
 const orderFeedback = document.querySelector('#order-feedback');
 const userEmail = document.querySelector('#user-email');
 
+// Elementos del Modal de Factura
+const invoiceModal = document.querySelector('#invoice-modal');
+const invoiceOverlay = document.querySelector('#invoice-overlay');
+const closeInvoiceButton = document.querySelector('#close-invoice');
+const printInvoiceButton = document.querySelector('#print-invoice');
+const invoiceItems = document.querySelector('#invoice-items');
+const invoiceTotal = document.querySelector('#invoice-total');
+const invoiceOrderNumber = document.querySelector('#invoice-order-number');
+const invoiceDate = document.querySelector('#invoice-date');
+const invoicePaymentMethod = document.querySelector('#invoice-payment-method');
+const invoiceNit = document.querySelector('#invoice-nit');
+const invoiceBusinessName = document.querySelector('#invoice-business-name');
+
 // Estado global de la orden
 let cart = [];
 let currentOrder = 1;
@@ -52,23 +65,12 @@ function renderProducts() {
   const term = productSearch.value.trim().toLowerCase();
 
   const visible = products.filter((product) => {
-    const matchesSearch = `${product.name} ${product.category}`
-      .toLowerCase()
-      .includes(term);
-
+    const matchesSearch = `${product.name} ${product.category}`.toLowerCase().includes(term);
     let matchesFilter = true;
 
-    if (selectedFilter === 'saltenas') {
-      matchesFilter = product.category === 'Salteña';
-    }
-
-    if (selectedFilter === 'masas') {
-      matchesFilter = product.category === 'Empanada' || product.category === 'Pan';
-    }
-
-    if (selectedFilter === 'bebidas') {
-      matchesFilter = product.category === 'Gaseosa' || product.category === 'Jugo';
-    }
+    if (selectedFilter === 'saltenas') matchesFilter = product.category === 'Salteña';
+    if (selectedFilter === 'masas') matchesFilter = product.category === 'Empanada' || product.category === 'Pan';
+    if (selectedFilter === 'bebidas') matchesFilter = product.category === 'Gaseosa' || product.category === 'Jugo';
 
     return matchesSearch && matchesFilter;
   });
@@ -114,9 +116,9 @@ function renderOrder() {
             <p class="order-item-name">${item.name}</p>
             <span class="order-item-price">${formatCurrency(item.price)} c/u</span>
             <div class="quantity-control" aria-label="Cantidad de ${item.name}">
-              <button type="button" data-action="decrease" data-product-id="${item.id}" aria-label="Quitar una unidad">−</button>
+              <button type="button" data-action="decrease" data-product-id="${item.id}">−</button>
               <span>${item.quantity}</span>
-              <button type="button" data-action="increase" data-product-id="${item.id}" aria-label="Agregar una unidad">+</button>
+              <button type="button" data-action="increase" data-product-id="${item.id}">+</button>
             </div>
           </div>
           <strong class="item-subtotal">${formatCurrency(item.price * item.quantity)}</strong>
@@ -154,6 +156,51 @@ function changeQuantity(id, amount) {
   renderOrder();
 }
 
+// Función para mostrar la factura en el modal
+function showInvoice() {
+  if (!cart.length) return;
+
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const paymentMethod = document.querySelector('#payment-method').value;
+  const nit = document.querySelector('#nit').value.trim();
+  const businessName = document.querySelector('#business-name').value.trim();
+
+  // 1. Número de pedido y Fecha actual
+  invoiceOrderNumber.textContent = `#${String(currentOrder).padStart(3, '0')}`;
+  const now = new Date();
+  invoiceDate.textContent = now.toLocaleString('es-BO', {
+    dateStyle: 'short',
+    timeStyle: 'short'
+  });
+
+  // 2. Renderizar lista de ítems en la factura
+  invoiceItems.innerHTML = cart
+  .map(
+    (item) => `
+    <div class="invoice-item">
+      <span class="invoice-item-name">${item.name}</span>
+      <span class="invoice-item-quantity">${item.quantity}</span>
+      <span class="invoice-item-unit">${formatCurrency(item.price)}</span>
+      <span class="invoice-item-subtotal">${formatCurrency(item.price * item.quantity)}</span>
+    </div>
+  `
+  )
+  .join('');
+
+  // 3. Totales y Datos opcionales
+  invoiceTotal.textContent = formatCurrency(total);
+  invoicePaymentMethod.textContent = paymentMethod;
+  invoiceNit.textContent = nit || '—';
+  invoiceBusinessName.textContent = businessName || '—';
+
+  // 4. Mostrar modal
+  invoiceModal.removeAttribute('hidden');
+}
+
+function closeInvoiceModal() {
+  invoiceModal.setAttribute('hidden', 'true');
+}
+
 // Autenticación de Sesión
 async function validateSession() {
   const token = localStorage.getItem('authToken');
@@ -178,11 +225,7 @@ productSearch.addEventListener('input', renderProducts);
 document.querySelectorAll('.filter-button').forEach((button) => {
   button.addEventListener('click', () => {
     selectedFilter = button.dataset.filter;
-
-    document.querySelectorAll('.filter-button').forEach((btn) => {
-      btn.classList.remove('active');
-    });
-
+    document.querySelectorAll('.filter-button').forEach((btn) => btn.classList.remove('active'));
     button.classList.add('active');
     renderProducts();
   });
@@ -196,10 +239,7 @@ productList.addEventListener('click', (event) => {
 orderItems.addEventListener('click', (event) => {
   const button = event.target.closest('[data-action]');
   if (button) {
-    changeQuantity(
-      Number(button.dataset.productId),
-      button.dataset.action === 'increase' ? 1 : -1
-    );
+    changeQuantity(Number(button.dataset.productId), button.dataset.action === 'increase' ? 1 : -1);
   }
 });
 
@@ -209,20 +249,62 @@ clearOrderButton.addEventListener('click', () => {
   renderOrder();
 });
 
-completeOrderButton.addEventListener('click', () => {
+// Evento Principal: Registrar Venta y Abrir Factura
+completeOrderButton.addEventListener('click', async () => {
+  if (!cart.length) return;
+
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  orderFeedback.textContent = `Venta de ${formatCurrency(total)} lista para registrar en la base de datos.`;
-  cart = [];
-  currentOrder += 1;
-  renderOrder();
+  const paymentMethod = document.querySelector('#payment-method').value;
+  const nit = document.querySelector('#nit').value.trim();
+  const businessName = document.querySelector('#business-name').value.trim();
+  const token = localStorage.getItem('authToken');
+
+  try {
+    completeOrderButton.disabled = true;
+    orderFeedback.textContent = 'Procesando venta...';
+
+    // 1. Enviar venta a la Base de Datos
+    await fetch(`${API_BASE_URL}/ventas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        monto_total: total,
+        metodo_pago: paymentMethod,
+        nit: nit,
+        razon_social: businessName,
+        items: cart
+      })
+    });
+
+    // 2. Desplegar factura modal en pantalla
+    showInvoice();
+
+    // 3. Reiniciar pedido para la siguiente venta
+    cart = [];
+    currentOrder += 1;
+    document.querySelector('#nit').value = '';
+    document.querySelector('#business-name').value = '';
+    orderFeedback.textContent = '';
+    renderOrder();
+  } catch (error) {
+    orderFeedback.textContent = error.message || 'Error al guardar la venta.';
+  } finally {
+    completeOrderButton.disabled = false;
+  }
 });
 
-document.querySelector('#logout-button').addEventListener('click', () => {
-  localStorage.removeItem('authToken');
-  window.location.replace('index.html');
+// Eventos de la Factura (Cerrar e Imprimir)
+closeInvoiceButton.addEventListener('click', closeInvoiceModal);
+if (invoiceOverlay) invoiceOverlay.addEventListener('click', closeInvoiceModal);
+
+printInvoiceButton.addEventListener('click', () => {
+  window.print();
 });
 
 // Inicialización
+validateSession();
 renderProducts();
 renderOrder();
-validateSession();
