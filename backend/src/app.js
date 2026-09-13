@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { healthCheck } = require('./controllers/health.controller');
 const authRoutes = require('./routes/auth.routes');
+const ventasRoutes = require('./routes/ventas.routes');
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 app.get('/api/health', healthCheck);
 app.use('/api/auth', authRoutes);
+app.use('/api/ventas', ventasRoutes);
 
 app.use((_req, res) => res.status(404).json({ message: 'Ruta no encontrada.' }));
 

@@ -110,7 +110,9 @@ async function loadCurrentUser() {
   const token = localStorage.getItem('authToken');
   if (!token) return showLogin();
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+    const response = await fetch(`${API_BASE_URL}/auth/me`, { 
+      headers: { Authorization: `Bearer ${token}` } 
+    });
     const data = await readResponse(response);
     showDashboard(data.user.email);
   } catch (_error) {

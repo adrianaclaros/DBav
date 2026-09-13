@@ -8,20 +8,49 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <!-- Barra Superior -->
-      <header class="topbar">
-        <img class="topbar-image" src="assets/banner.png" alt="Banner Salteñería Initiña" />
-        <a class="brand" href="pedidos.html" aria-label="Inicio de Salteñería Intiña">
-   	  <img class="brand-logo" src="assets/imagotipo.png" alt="Logo Intiña" />
-  	  <span>INTIÑA</span>
-	</a>
-        <div class="user-menu">
-          <span id="user-email" class="user-email"></span>
-          <button id="logout-button" class="button-secondary" type="button">Cerrar sesión</button>
-        </div>
-      </header>
+    <!-- MENÚ LATERAL Y NAVEGACIÓN GLOBAL -->
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Abrir menú">
+      ☰
+    </button>
 
+    <aside id="side-menu" class="side-menu">
+      <div class="side-menu-header">
+        <button id="menu-close" class="menu-close" type="button" aria-label="Cerrar menú">×</button>
+        <img src="assets/isotipo.png" alt="Logo Intiña" class="side-menu-logo" />
+        <p>Salteñería</p>
+      </div>
+
+      <nav class="side-menu-nav">
+        <a href="pedidos.html" class="menu-item active">
+          <span class="menu-icon">🛒</span>
+          <span>Pedidos</span>
+        </a>
+
+        <a href="ventas.html" class="menu-item">
+          <span class="menu-icon">🧾</span>
+          <span>Historial de ventas</span>
+        </a>
+      </nav>
+
+      <div class="side-menu-footer">
+        <div class="menu-user">
+          <span class="menu-user-icon">👤</span>
+          <div>
+            <small>Usuario</small>
+            <span id="user-email" class="user-email">cargando...</span>
+          </div>
+        </div>
+
+        <button id="logout-button" class="menu-logout" type="button">
+          ⇥ &nbsp; Cerrar sesión
+        </button>
+      </div>
+    </aside>
+
+    <div id="menu-overlay" class="menu-overlay"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="app-shell">
       <!-- Encabezado de Página -->
       <section class="page-header">
         <div>
@@ -29,9 +58,9 @@
           <p class="subtitle">Selecciona los productos para la venta actual.</p>
         </div>
         <div class="order-number">
-	  <span>Pedido actual:</span>
-	  <strong id="order-number">#001</strong>
-	</div>
+          <span>Pedido actual:</span>
+          <strong id="order-number">#001</strong>
+        </div>
       </section>
 
       <!-- Layout de Ventas -->
@@ -110,9 +139,8 @@
       <div class="invoice-overlay" id="invoice-overlay"></div>
       <section class="invoice-window" role="dialog" aria-modal="true" aria-labelledby="invoice-title">
         
-        <!-- BARRA DE ACCIONES ARRIBA (IMPRIMIR + CERRAR) -->
         <div class="invoice-actions">
-          <button id="print-invoice" class="invoice-print-btn" type="button" onclick="window.print()" title="Imprimir comanda/factura">🖨️</button>
+          <button id="print-invoice" type="button" class="invoice-print-btn" title="Imprimir">🖨️</button>
           <button id="close-invoice" class="invoice-close" type="button" aria-label="Cerrar factura">×</button>
         </div>
 
@@ -177,6 +205,7 @@
 
     <!-- Scripts -->
     <script src="config.js"></script>
+    <script src="menu.js"></script>
     <script src="pedido.js"></script>
   </body>
 </html>

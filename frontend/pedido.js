@@ -157,43 +157,32 @@ function changeQuantity(id, amount) {
 }
 
 // Función para mostrar la factura en el modal
-function showInvoice() {
-  if (!cart.length) return;
+function showInvoice(venta, items) {
+  if (!venta || !items?.length) return;
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const paymentMethod = document.querySelector('#payment-method').value;
-  const nit = document.querySelector('#nit').value.trim();
-  const businessName = document.querySelector('#business-name').value.trim();
+  invoiceOrderNumber.textContent = `#${String(venta.Venta_ID).padStart(3, '0')}`;
 
-  // 1. Número de pedido y Fecha actual
-  invoiceOrderNumber.textContent = `#${String(currentOrder).padStart(3, '0')}`;
-  const now = new Date();
-  invoiceDate.textContent = now.toLocaleString('es-BO', {
-    dateStyle: 'short',
-    timeStyle: 'short'
-  });
+  const dateText = String(venta.Fecha).slice(0, 10);
+  const timeText = String(venta.Hora).slice(0, 8);
+  const invoiceDateValue = new Date(`${dateText}T${timeText}`);
+  invoiceDate.textContent = Number.isNaN(invoiceDateValue.getTime())
+    ? `${dateText} ${timeText}`
+    : invoiceDateValue.toLocaleString('es-BO', { dateStyle: 'short', timeStyle: 'short' });
 
-  // 2. Renderizar lista de ítems en la factura
-  invoiceItems.innerHTML = cart
-  .map(
-    (item) => `
+  invoiceItems.innerHTML = items.map((item) => `
     <div class="invoice-item">
-      <span class="invoice-item-name">${item.name}</span>
-      <span class="invoice-item-quantity">${item.quantity}</span>
-      <span class="invoice-item-unit">${formatCurrency(item.price)}</span>
-      <span class="invoice-item-subtotal">${formatCurrency(item.price * item.quantity)}</span>
+      <span class="invoice-item-name">${item.nombre ?? item.Nombre}</span>
+      <span class="invoice-item-quantity">${item.cantidad ?? item.Cantidad}</span>
+      <span class="invoice-item-price">${formatCurrency(Number(item.precio_unitario ?? item.Precio_Unitario))}</span>
+      <span class="invoice-item-price">${formatCurrency(Number(item.subtotal ?? item.Subtotal))}</span>
     </div>
-  `
-  )
-  .join('');
+  `).join('');
 
-  // 3. Totales y Datos opcionales
-  invoiceTotal.textContent = formatCurrency(total);
-  invoicePaymentMethod.textContent = paymentMethod;
-  invoiceNit.textContent = nit || '—';
-  invoiceBusinessName.textContent = businessName || '—';
+  invoiceTotal.textContent = formatCurrency(Number(venta.Total));
+  invoicePaymentMethod.textContent = venta.Metodo_Pago;
+  invoiceNit.textContent = venta.NIT && venta.NIT !== '0' ? venta.NIT : '—';
+  invoiceBusinessName.textContent = venta.Razon_Social && venta.Razon_Social !== 'Sin Nombre' ? venta.Razon_Social : '—';
 
-  // 4. Mostrar modal
   invoiceModal.removeAttribute('hidden');
 }
 
@@ -202,6 +191,24 @@ function closeInvoiceModal() {
 }
 
 // Autenticación de Sesión
+async function loadNextOrderNumber() {
+  const token = localStorage.getItem('authToken');
+  if (!token) return;
+
+  try {
+    const data = await readResponse(
+      await fetch(`${API_BASE_URL}/ventas?range=ano`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    );
+    const maxId = data.ventas.reduce((max, venta) => Math.max(max, Number(venta.Venta_ID)), 0);
+    if (maxId > 0) currentOrder = maxId + 1;
+    renderOrder();
+  } catch (_error) {
+    // Si falla esta consulta, el registro de la venta sigue funcionando.
+  }
+}
+
 async function validateSession() {
   const token = localStorage.getItem('authToken');
   if (!token) return window.location.replace('index.html');
@@ -212,7 +219,7 @@ async function validateSession() {
         headers: { Authorization: `Bearer ${token}` }
       })
     );
-    userEmail.textContent = data.user.email;
+    if (userEmail) userEmail.textContent = data.user.email;
   } catch (_error) {
     localStorage.removeItem('authToken');
     window.location.replace('index.html');
@@ -263,28 +270,29 @@ completeOrderButton.addEventListener('click', async () => {
     completeOrderButton.disabled = true;
     orderFeedback.textContent = 'Procesando venta...';
 
-    // 1. Enviar venta a la Base de Datos
-    await fetch(`${API_BASE_URL}/ventas`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        monto_total: total,
-        metodo_pago: paymentMethod,
-        nit: nit,
-        razon_social: businessName,
-        items: cart
+    // Petición con lectura y manejo seguro de respuesta
+    const data = await readResponse(
+      await fetch(`${API_BASE_URL}/ventas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          monto_total: total,
+          metodo_pago: paymentMethod,
+          nit,
+          razon_social: businessName,
+          items: cart.map((item) => ({ id: item.id, quantity: item.quantity }))
+        })
       })
-    });
+    );
 
-    // 2. Desplegar factura modal en pantalla
-    showInvoice();
+    showInvoice(data.venta, data.items);
 
-    // 3. Reiniciar pedido para la siguiente venta
+    // Reiniciar pedido para el siguiente registro
     cart = [];
-    currentOrder += 1;
+    currentOrder = Number(data.venta.Venta_ID) + 1;
     document.querySelector('#nit').value = '';
     document.querySelector('#business-name').value = '';
     orderFeedback.textContent = '';
@@ -306,5 +314,6 @@ printInvoiceButton.addEventListener('click', () => {
 
 // Inicialización
 validateSession();
+loadNextOrderNumber();
 renderProducts();
 renderOrder();
