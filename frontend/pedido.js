@@ -1,23 +1,67 @@
 const API_BASE_URL = window.APP_CONFIG.API_BASE_URL;
 
-const products = [
-  { id: 1, name: 'Salteña de pollo/dulce', category: 'Salteña', price: 7, image: 'assets/salteña.jpg' },
-  { id: 2, name: 'Salteña de carne', category: 'Salteña', price: 7, image: 'assets/salteña.jpg' },
-  { id: 3, name: 'Salteña de mixta', category: 'Salteña', price: 8, image: 'assets/salteña.jpg' },
-  { id: 4, name: 'Salteña picante', category: 'Salteña', price: 7, image: 'assets/salteña.jpg' },
-  { id: 15, name: 'Salteña de fricase', category: 'Salteña', price: 8, image: 'assets/salteña.jpg' },
-  { id: 16, name: 'Salteña extra-picante', category: 'Salteña', price: 8, image: 'assets/salteña.jpg' },
-  { id: 5, name: 'Empanada de queso', category: 'Empanada', price: 6, image: 'assets/empanada.jpeg' },
-  { id: 6, name: 'Empanada de pollo', category: 'Empanada', price: 6, image: 'assets/empanada.jpeg' },
-  { id: 7, name: 'Pan', category: 'Pan', price: 1, image: 'assets/pan.jpg' },
-  { id: 8, name: 'Coca-Cola Personal', category: 'Gaseosa', price: 8, image: 'assets/CocaP.png' },
-  { id: 9, name: 'Coca-Cola Familiar', category: 'Gaseosa', price: 15, image: 'assets/CocaF.png' },
-  { id: 10, name: 'Fanta Personal', category: 'Gaseosa', price: 8, image: 'assets/FantaP.png' },
-  { id: 11, name: 'Fanta Familiar', category: 'Gaseosa', price: 15, image: 'assets/FantaF.jpeg' },
-  { id: 12, name: 'Mocochinchi', category: 'Jugo', price: 5, image: 'assets/moco.jpeg' },
-  { id: 13, name: 'Canela', category: 'Jugo', price: 5, image: 'assets/canela.jpg' },
-  { id: 14, name: 'Cebada', category: 'Jugo', price: 5, image: 'assets/cebada.jpeg' }
-];
+let products = [];
+
+const productImages = {
+  'Salteña de pollo/dulce': 'assets/salteña.jpg',
+  'Salteña de carne': 'assets/salteña.jpg',
+  'Salteña mixta': 'assets/salteña.jpg',
+  'Salteña picante': 'assets/salteña.jpg',
+  'Salteña de fricase': 'assets/salteña.jpg',
+  'Salteña extra-picante': 'assets/salteña.jpg',
+
+  'Empanada de queso': 'assets/empanada.jpeg',
+  'Empanada de pollo': 'assets/empanada.jpeg',
+
+  'Pan': 'assets/pan.jpg',
+
+  'Coca-Cola Personal 300 ml': 'assets/CocaP.png',
+  'Coca-Cola Familiar 2 L': 'assets/CocaF.png',
+  'Fanta Personal 300 ml': 'assets/FantaP.png',
+  'Fanta Familiar 2 L': 'assets/FantaF.jpeg',
+
+  'Mocochinchi': 'assets/moco.jpeg',
+  'Canela': 'assets/canela.jpg',
+  'Cebada': 'assets/cebada.jpeg'
+};
+
+async function loadProducts() {
+  const token = localStorage.getItem('authToken');
+
+  if (!token) {
+    window.location.replace('index.html');
+    return;
+  }
+
+  try {
+    const data = await readResponse(
+      await fetch(`${API_BASE_URL}/productos`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+    );
+
+    products = data.productos.map((product) => ({
+      id: product.Producto_ID,
+      name: product.Nombre,
+      category: product.Categoria,
+      price: Number(product.Precio_Venta),
+      stock: Number(product.Stock),
+      image: productImages[product.Nombre] || 'assets/salteña.jpg'
+    }));
+
+    renderProducts();
+  } catch (error) {
+    productList.innerHTML = `
+      <p class="no-results">
+        No se pudieron cargar los productos.
+      </p>
+    `;
+
+    console.error('Error al cargar productos:', error);
+  }
+}
 
 // Elementos del DOM
 const productList = document.querySelector('#product-list');
@@ -65,12 +109,27 @@ function renderProducts() {
   const term = productSearch.value.trim().toLowerCase();
 
   const visible = products.filter((product) => {
-    const matchesSearch = `${product.name} ${product.category}`.toLowerCase().includes(term);
+    const matchesSearch = `${product.name} ${product.category}`
+      .toLowerCase()
+      .includes(term);
+
     let matchesFilter = true;
 
-    if (selectedFilter === 'saltenas') matchesFilter = product.category === 'Salteña';
-    if (selectedFilter === 'masas') matchesFilter = product.category === 'Empanada' || product.category === 'Pan';
-    if (selectedFilter === 'bebidas') matchesFilter = product.category === 'Gaseosa' || product.category === 'Jugo';
+    if (selectedFilter === 'saltenas') {
+      matchesFilter = product.category === 'Salteña';
+    }
+
+    if (selectedFilter === 'masas') {
+      matchesFilter =
+        product.category === 'Empanada' ||
+        product.category === 'Pan';
+    }
+
+    if (selectedFilter === 'bebidas') {
+      matchesFilter =
+        product.category === 'Gaseosa' ||
+        product.category === 'Jugo';
+    }
 
     return matchesSearch && matchesFilter;
   });
@@ -79,13 +138,48 @@ function renderProducts() {
     ? visible
         .map(
           (product) => `
-        <article class="product-card">
+        <article class="product-card ${product.stock <= 0 ? 'out-of-stock' : ''}">
           <p class="product-name">${product.name}</p>
-          <img src="${product.image}" alt="${product.name}" class="product-image">
-          <span class="product-price">${formatCurrency(product.price)}</span>
-          <button class="add-product" type="button" data-product-id="${product.id}">
-            Agregar
-          </button>
+
+          <img
+            src="${product.image}"
+            alt="${product.name}"
+            class="product-image"
+          >
+
+          <span class="product-price">
+            ${formatCurrency(product.price)}
+          </span>
+
+          ${
+            product.stock > 0
+              ? `
+                <span class="product-stock">
+                  Disponibles: ${product.stock}
+                </span>
+
+                <button
+                  class="add-product"
+                  type="button"
+                  data-product-id="${product.id}"
+                >
+                  Agregar
+                </button>
+              `
+              : `
+                <span class="product-stock product-out">
+                  AGOTADO
+                </span>
+
+                <button
+                  class="add-product"
+                  type="button"
+                  disabled
+                >
+                  Agotado
+                </button>
+              `
+          }
         </article>
       `
         )
@@ -132,12 +226,23 @@ function renderOrder() {
 // Lógica de Carrito
 function addProduct(id) {
   const product = products.find((item) => item.id === id);
+  if (!product || product.stock <= 0) return;
+
   const item = cart.find((entry) => entry.id === id);
 
   if (item) {
+    if (item.quantity >= product.stock) {
+      orderFeedback.textContent =
+        `No puedes agregar más. Solo hay ${product.stock} unidades disponibles de ${product.name}.`;
+      return;
+    }
+
     item.quantity += 1;
   } else {
-    cart.push({ ...product, quantity: 1 });
+    cart.push({
+      ...product,
+      quantity: 1
+    });
   }
 
   orderFeedback.textContent = '';
@@ -148,11 +253,23 @@ function changeQuantity(id, amount) {
   const item = cart.find((entry) => entry.id === id);
   if (!item) return;
 
-  item.quantity += amount;
+  const product = products.find((product) => product.id === id);
+  if (!product) return;
+
+  const newQuantity = item.quantity + amount;
+
+  if (newQuantity > product.stock) {
+    orderFeedback.textContent = `Solo hay ${product.stock} unidades disponibles de ${product.name}.`;
+    return;
+  }
+
+  item.quantity = newQuantity;
+
   if (item.quantity <= 0) {
     cart = cart.filter((entry) => entry.id !== id);
   }
 
+  orderFeedback.textContent = '';
   renderOrder();
 }
 
@@ -288,15 +405,18 @@ completeOrderButton.addEventListener('click', async () => {
       })
     );
 
-    showInvoice(data.venta, data.items);
+ showInvoice(data.venta, data.items);
 
-    // Reiniciar pedido para el siguiente registro
-    cart = [];
-    currentOrder = Number(data.venta.Venta_ID) + 1;
-    document.querySelector('#nit').value = '';
-    document.querySelector('#business-name').value = '';
-    orderFeedback.textContent = '';
-    renderOrder();
+cart = [];
+currentOrder = Number(data.venta.Venta_ID) + 1;
+document.querySelector('#nit').value = '';
+document.querySelector('#business-name').value = '';
+orderFeedback.textContent = '';
+
+await loadProducts();
+
+renderOrder();   
+
   } catch (error) {
     orderFeedback.textContent = error.message || 'Error al guardar la venta.';
   } finally {
@@ -308,12 +428,18 @@ completeOrderButton.addEventListener('click', async () => {
 closeInvoiceButton.addEventListener('click', closeInvoiceModal);
 if (invoiceOverlay) invoiceOverlay.addEventListener('click', closeInvoiceModal);
 
-printInvoiceButton.addEventListener('click', () => {
-  window.print();
+printInvoiceButton.addEventListener('click', async () => {
+  try {
+    await loadProducts();
+    window.print();
+  } catch (error) {
+    console.error('Error al actualizar los productos:', error);
+    window.print();
+  }
 });
 
 // Inicialización
 validateSession();
 loadNextOrderNumber();
-renderProducts();
+loadProducts();
 renderOrder();

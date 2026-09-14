@@ -1,56 +1,152 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Salteñas Intiña | Pedidos</title>
-    <link rel="icon" type="image/png" href="assets/imagotipo.png">
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <!-- MENÚ LATERAL Y NAVEGACIÓN GLOBAL -->
-    <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Abrir menú">
-      ☰
-    </button>
 
-    <aside id="side-menu" class="side-menu">
-      <div class="side-menu-header">
-        <button id="menu-close" class="menu-close" type="button" aria-label="Cerrar menú">×</button>
-        <img src="assets/isotipo.png" alt="Logo Intiña" class="side-menu-logo" />
-        <p>Salteñería</p>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-      <nav class="side-menu-nav">
-        <a href="pedidos.html" class="menu-item active">
-          <span class="menu-icon">🛒</span>
-          <span>Pedidos</span>
-        </a>
+  <title>Salteñas Intiña | Pedidos</title>
 
-        <a href="ventas.html" class="menu-item">
-          <span class="menu-icon">🧾</span>
-          <span>Historial de ventas</span>
-        </a>
-      </nav>
+  <link rel="icon" type="image/png" href="assets/imagotipo.png">
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-      <div class="side-menu-footer">
-        <div class="menu-user">
-          <span class="menu-user-icon">👤</span>
-          <div>
-            <small>Usuario</small>
-            <span id="user-email" class="user-email">cargando...</span>
-          </div>
-        </div>
+<body>
 
-        <button id="logout-button" class="menu-logout" type="button">
-          ⇥ &nbsp; Cerrar sesión
+  <!-- =========================================
+       BANNER SUPERIOR
+  ========================================== -->
+
+  <header class="topbar">
+
+    <!-- Imagen del banner -->
+    <img
+      class="topbar-image"
+      src="assets/banner.png"
+      alt="Banner Salteñería Intiña"
+    />
+
+    <!-- Contenido del banner -->
+    <div class="topbar-content">
+
+      <!-- Botón hamburguesa -->
+      <button
+        id="menu-toggle"
+        class="menu-toggle"
+        type="button"
+        aria-label="Abrir menú"
+        aria-controls="side-menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <!-- Logo + nombre -->
+      <a
+        class="brand"
+        href="pedidos.html"
+        aria-label="Inicio de Salteñería Intiña"
+      >
+        <img
+          src="assets/imagotipo.png"
+          alt="Logo Intiña"
+          class="brand-logo"
+        />
+
+        <span>INTIÑA</span>
+      </a>
+
+      <!-- Usuario + cerrar sesión -->
+      <div class="user-menu">
+
+        <span
+          id="user-email"
+          class="user-email"
+        ></span>
+
+        <button
+          id="logout-button"
+          class="button-secondary"
+          type="button"
+        >
+          Cerrar sesión
         </button>
+
       </div>
-    </aside>
 
-    <div id="menu-overlay" class="menu-overlay"></div>
+    </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="app-shell">
+  </header>
+
+
+  <!-- =========================================
+       MENÚ LATERAL
+  ========================================== -->
+
+  <aside
+    id="side-menu"
+    class="side-menu"
+    aria-hidden="true"
+  >
+
+    <div class="side-menu-header">
+
+      <button
+        id="menu-close"
+        class="menu-close"
+        type="button"
+        aria-label="Cerrar menú"
+      >
+        ×
+      </button>
+
+      <img
+        src="assets/imagotipo.png"
+        alt="Logo Intiña"
+        class="side-menu-logo"
+      />
+
+      <h2>INTIÑA</h2>
+
+      <p>Salteñería</p>
+
+    </div>
+
+
+    <nav class="side-menu-nav">
+
+      <!-- Página actual -->
+      <a
+        href="pedidos.html"
+        class="menu-item active"
+      >
+        <span class="menu-icon">🛒</span>
+        <span>Pedidos</span>
+      </a>
+
+      <!-- Historial -->
+      <a
+        href="ventas.html"
+        class="menu-item"
+      >
+        <span class="menu-icon">🧾</span>
+        <span>Historial de ventas</span>
+      </a>
+
+    </nav>
+
+  </aside>
+
+
+  <!-- Fondo detrás del menú -->
+  <div
+    id="menu-overlay"
+    class="menu-overlay"
+  ></div>
+
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="app-shell">
       <!-- Encabezado de Página -->
       <section class="page-header">
         <div>

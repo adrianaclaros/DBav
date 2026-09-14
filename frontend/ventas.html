@@ -1,149 +1,478 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Salteñas Intiña | Historial de Ventas</title>
+
   <link rel="icon" type="image/png" href="assets/imagotipo.png">
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <!-- Botón Hamburguesa -->
-  <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Abrir menú">☰</button>
 
-  <!-- Menú Lateral -->
-  <aside id="side-menu" class="side-menu">
-    <div class="side-menu-header">
-      <button id="menu-close" class="menu-close" type="button" aria-label="Cerrar menú">×</button>
-      <img src="assets/isotipo.png" alt="Logo Intiña" class="side-menu-logo" />
-      <p>Salteñería</p>
+<body>
+
+  <!-- =========================================
+       BANNER SUPERIOR
+  ========================================== -->
+
+  <header class="topbar">
+
+    <!-- Imagen del banner -->
+    <img
+      class="topbar-image"
+      src="assets/banner.png"
+      alt="Banner Salteñería Intiña"
+    />
+
+    <!-- Capa de contenido del banner -->
+    <div class="topbar-content">
+
+      <!-- Botón hamburguesa -->
+      <button
+        id="menu-toggle"
+        class="menu-toggle"
+        type="button"
+        aria-label="Abrir menú"
+        aria-controls="side-menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <!-- Logo -->
+      <a
+        class="brand"
+        href="pedidos.html"
+        aria-label="Inicio de Salteñería Intiña"
+      >
+        <img
+          src="assets/imagotipo.png"
+          alt="Logo Intiña"
+          class="brand-logo"
+        />
+
+        <span>INTIÑA</span>
+      </a>
+
+      <!-- Usuario + cerrar sesión -->
+      <div class="user-menu">
+
+        <span
+          id="user-email"
+          class="user-email"
+        ></span>
+
+        <button
+          id="logout-button"
+          class="button-secondary"
+          type="button"
+        >
+          Cerrar sesión
+        </button>
+
+      </div>
+
     </div>
 
+  </header>
+
+
+  <!-- =========================================
+       MENÚ LATERAL
+  ========================================== -->
+
+  <aside
+    id="side-menu"
+    class="side-menu"
+    aria-hidden="true"
+  >
+
+    <div class="side-menu-header">
+
+      <button
+        id="menu-close"
+        class="menu-close"
+        type="button"
+        aria-label="Cerrar menú"
+      >
+        ×
+      </button>
+
+      <img
+        src="assets/imagotipo.png"
+        alt="Logo Intiña"
+        class="side-menu-logo"
+      />
+
+      <h2>INTIÑA</h2>
+
+      <p>Salteñería</p>
+
+    </div>
+
+
     <nav class="side-menu-nav">
-      <a href="pedidos.html" class="menu-item">
+
+      <a
+        href="pedidos.html"
+        class="menu-item"
+      >
         <span class="menu-icon">🛒</span>
         <span>Pedidos</span>
       </a>
-      <a href="ventas.html" class="menu-item active">
+
+      <a
+        href="ventas.html"
+        class="menu-item active"
+      >
         <span class="menu-icon">🧾</span>
         <span>Historial de ventas</span>
       </a>
+
     </nav>
 
-    <div class="side-menu-footer">
-      <div class="menu-user">
-        <span class="menu-user-icon">👤</span>
-        <div>
-          <small>Usuario</small>
-          <span id="user-email" class="user-email">cargando...</span>
-        </div>
-      </div>
-      <button id="logout-button" class="menu-logout" type="button">⇥ &nbsp; Cerrar sesión</button>
-    </div>
   </aside>
 
-  <div id="menu-overlay" class="menu-overlay"></div>
+
+  <!-- Fondo que aparece cuando el menú está abierto -->
+  <div
+    id="menu-overlay"
+    class="menu-overlay"
+  ></div>
+
+
+  <!-- =========================================
+       CONTENIDO
+  ========================================== -->
 
   <main class="app-shell">
+
     <section class="page-header">
+
       <div>
-        <p class="eyebrow">Ventas</p>
+
         <h1>Historial de ventas</h1>
-        <p class="subtitle">Consulta y filtra los comprobantes registrados.</p>
+
+        <p class="subtitle">
+          Consulta y filtra los comprobantes registrados.
+        </p>
+
       </div>
+
     </section>
+
 
     <section class="sales-layout" aria-label="Historial de ventas">
-      <section class="panel catalog-panel history-panel">
-        <div class="panel-heading">
-          <div>
-            <h2>Comprobantes registrados</h2>
-            <p id="history-summary">Cargando ventas...</p>
-          </div>
-        </div>
 
-        <div class="product-filters history-filters">
-          <button type="button" class="filter-button active" data-range="dia">Hoy</button>
-          <button type="button" class="filter-button" data-range="semana">Esta semana</button>
-          <button type="button" class="filter-button" data-range="mes">Este mes</button>
-          <button type="button" class="filter-button" data-range="ano">Este año</button>
-        </div>
+  <!-- COLUMNA IZQUIERDA: Resultados de Ventas -->
+  <section class="panel catalog-panel history-panel sales-main-column">
+    <div class="panel-heading">
+      <div>
+        <h2>Comprobantes registrados</h2>
+        <p id="history-summary">Cargando ventas...</p>
+      </div>
+    </div>
 
-        <div class="invoice-history-table">
-          <div class="invoice-table-header history-header">
-            <span>N° Pedido</span>
-            <span>Fecha / Hora</span>
-            <span>Método</span>
-            <span>Total</span>
-            <span>Acciones</span>
-          </div>
-          <div id="sales-history-list"></div>
-        </div>
-      </section>
-    </section>
+    <div class="invoice-history-table">
+      <div class="invoice-table-header history-header">
+        <span>N° Pedido</span>
+        <span>Fecha / Hora</span>
+        <span>Método</span>
+        <span>Total</span>
+        <span>Acciones</span>
+      </div>
+      <div id="sales-history-list"></div>
+    </div>
+  </section>
+
+  <!-- COLUMNA DERECHA: Recuadro de Filtros -->
+<aside class="panel sales-filters-sidebar">
+  <h3>Filtrar ventas</h3>
+
+  <!-- Búsqueda general arriba -->
+  <div class="filter-group text-search-group">
+    <label for="search-query">Buscar cliente / N°</label>
+    <input 
+      type="search" 
+      id="search-query" 
+      placeholder="N° Pedido, NIT o Razón social..." 
+    />
+  </div>
+
+  <hr class="filter-divider" />
+
+  <!-- Seleccionador de tipo de filtro -->
+  <div class="filter-group">
+    <label for="filter-type">Filtrar por período</label>
+    <select id="filter-type">
+  <option value="todos">Todas las fechas</option>
+  <option value="dia">Día</option>
+  <option value="semana">Semana</option>
+  <option value="mes">Mes</option>
+  <option value="ano">Año</option>
+  <option value="rango">Rango de fechas</option>
+</select>
+  </div>
+
+  <form id="sales-filter-form" class="sales-filters-bar">
+    
+    <!-- Opciones para DÍA -->
+    <div id="option-dia" class="filter-suboptions">
+      <label for="select-dia">Seleccionar día</label>
+      <select id="select-dia">
+        <option value="hoy">Hoy</option>
+        <option value="ayer">Ayer</option>
+        <option value="custom">Fecha específica...</option>
+      </select>
+      <input type="date" id="date-specific-day" class="custom-date-input" hidden />
+    </div>
+
+    <!-- Opciones para SEMANA -->
+    <div id="option-semana" class="filter-suboptions" hidden>
+      <label for="select-semana">Seleccionar semana</label>
+      <select id="select-semana">
+        <option value="esta-semana">Esta semana</option>
+        <option value="custom">Semana a partir de fecha...</option>
+      </select>
+      <input type="date" id="date-specific-week" class="custom-date-input" hidden />
+    </div>
+
+    <!-- Opciones para MES -->
+    <div id="option-mes" class="filter-suboptions" hidden>
+  <label for="select-mes">Seleccionar mes</label>
+
+  <select id="select-mes">
+    <option value="este-mes">Este mes</option>
+    <option value="custom">Seleccionar otro mes...</option>
+  </select>
+
+  <input
+    type="month"
+    id="input-month"
+    hidden
+  >
+</div>
+
+    <!-- Opciones para AÑO -->
+    <div id="option-ano" class="filter-suboptions" hidden>
+  <label for="select-ano">Seleccionar año</label>
+
+  <select id="select-ano">
+    <option value="este-ano">Este año</option>
+    <option value="custom">Seleccionar otro año...</option>
+  </select>
+
+  <input
+    type="number"
+    id="input-year"
+    min="2020"
+    max="2100"
+    hidden
+  >
+</div>
+
+    <!-- Opciones para RANGO PERSONALIZADO -->
+    <div id="option-rango" class="filter-suboptions" hidden>
+      <div class="filter-group">
+        <label for="date-from">Desde</label>
+        <input type="date" id="date-from" />
+      </div>
+      <div class="filter-group">
+        <label for="date-to">Hasta</label>
+        <input type="date" id="date-to" />
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="filter-group actions-group">
+      <button type="submit" class="button-primary">Aplicar filtro</button>
+      <button type="button" id="clear-filters" class="button-secondary">Restablecer</button>
+    </div>
+  </form>
+</aside>
+
+</section>
+
   </main>
 
-  <!-- Modal para volver a consultar una factura -->
-  <div id="invoice-modal" class="invoice-modal" hidden>
-    <div class="invoice-overlay" id="invoice-overlay"></div>
-    <section class="invoice-window" role="dialog" aria-modal="true" aria-labelledby="invoice-title">
+
+  <!-- =========================================
+       MODAL FACTURA
+  ========================================== -->
+
+  <div
+    id="invoice-modal"
+    class="invoice-modal"
+    hidden
+  >
+
+    <div
+      class="invoice-overlay"
+      id="invoice-overlay"
+    ></div>
+
+    <section
+      class="invoice-window"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="invoice-title"
+    >
+
       <div class="invoice-actions">
-        <button id="print-invoice" type="button" class="invoice-print-btn" title="Imprimir">🖨️</button>
-        <button id="close-invoice" class="invoice-close" type="button" aria-label="Cerrar factura">×</button>
+
+        <button
+          id="print-invoice"
+          type="button"
+          class="invoice-print-btn"
+          title="Imprimir"
+        >
+          🖨️
+        </button>
+
+        <button
+          id="close-invoice"
+          class="invoice-close"
+          type="button"
+          aria-label="Cerrar factura"
+        >
+          ×
+        </button>
+
       </div>
+
 
       <div class="invoice-header">
-        <img src="assets/imagotipo.png" alt="Intiña" class="invoice-logo" />
+
+        <img
+          src="assets/imagotipo.png"
+          alt="Intiña"
+          class="invoice-logo"
+        />
+
         <div>
-          <h2 id="invoice-title">SALTEÑERÍA INTIÑA</h2>
-          <p>Comprobante de venta</p>
+
+          <h2 id="invoice-title">
+            SALTEÑERÍA INTIÑA
+          </h2>
+
+          <p>
+            Comprobante de venta
+          </p>
+
         </div>
+
       </div>
 
+
       <div class="invoice-divider"></div>
+
 
       <div class="invoice-info">
+
         <div>
+
           <span>Pedido</span>
-          <strong id="invoice-order-number">#001</strong>
+
+          <strong id="invoice-order-number">
+            #001
+          </strong>
+
         </div>
+
         <div>
+
           <span>Fecha</span>
+
           <strong id="invoice-date"></strong>
+
         </div>
+
       </div>
+
 
       <div class="invoice-divider"></div>
 
+
       <div class="invoice-table-header">
+
         <span>DESCRIPCIÓN</span>
         <span>CANT.</span>
         <span>P.UNIT.</span>
         <span>SUBTOTAL</span>
+
       </div>
 
-      <div id="invoice-items" class="invoice-items"></div>
+
+      <div
+        id="invoice-items"
+        class="invoice-items"
+      ></div>
+
 
       <div class="invoice-total">
+
         <span>TOTAL</span>
-        <strong id="invoice-total">Bs 0,00</strong>
+
+        <strong id="invoice-total">
+          Bs 0,00
+        </strong>
+
       </div>
+
 
       <div class="invoice-payment">
-        <p><span>Método de pago</span><strong id="invoice-payment-method">Efectivo</strong></p>
-        <p><span>NIT</span><strong id="invoice-nit">—</strong></p>
-        <p><span>Razón social</span><strong id="invoice-business-name">—</strong></p>
+
+        <p>
+          <span>Método de pago</span>
+          <strong id="invoice-payment-method">
+            Efectivo
+          </strong>
+        </p>
+
+        <p>
+          <span>NIT</span>
+          <strong id="invoice-nit">
+            —
+          </strong>
+        </p>
+
+        <p>
+          <span>Razón social</span>
+          <strong id="invoice-business-name">
+            —
+          </strong>
+        </p>
+
       </div>
 
+
       <div class="invoice-footer">
-        <p>¡Gracias por su compra!</p>
-        <small>Salteñería Intiña</small>
+
+        <p>
+          ¡Gracias por su compra!
+        </p>
+
+        <small>
+          Salteñería Intiña
+        </small>
+
       </div>
+
     </section>
+
   </div>
+
+
+  <!-- =========================================
+       SCRIPTS
+  ========================================== -->
 
   <script src="config.js"></script>
   <script src="menu.js"></script>
   <script src="ventas.js"></script>
+
 </body>
 </html>
+```
