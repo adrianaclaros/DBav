@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salteñas Intiña | Dashboard</title>
+  <link rel="icon" type="image/png" href="assets/imagotipo.png">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <!-- BANNER SUPERIOR -->
+  <header class="topbar">
+    <img class="topbar-image" src="assets/banner.png" alt="Banner Salteñería Intiña" />
+    <div class="topbar-content">
+      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Abrir menú" aria-controls="side-menu" aria-expanded="false">
+        ☰
+      </button>
+      <a class="brand" href="pedidos.html" aria-label="Inicio de Salteñería Intiña">
+        <img src="assets/imagotipo.png" alt="Logo Intiña" class="brand-logo" />
+        <span>INTIÑA</span>
+      </a>
+      <div class="user-menu">
+        <span id="user-email" class="user-email"></span>
+        <button id="logout-button" class="button-secondary" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MENÚ LATERAL DESPLEGABLE -->
+  <aside id="side-menu" class="side-menu" aria-hidden="true">
+    <div class="side-menu-header">
+      <button id="menu-close" class="menu-close" type="button" aria-label="Cerrar menú">×</button>
+      <img src="assets/imagotipo.png" alt="Logo Intiña" class="side-menu-logo" />
+      <h2>INTIÑA</h2>
+      <p>Salteñería</p>
+    </div>
+    <nav class="side-menu-nav">
+      <a href="pedidos.html" class="menu-item">
+        <span class="menu-icon">🛒</span>
+        <span>Pedidos</span>
+      </a>
+      <a href="ventas.html" class="menu-item">
+        <span class="menu-icon">🧾</span>
+        <span>Historial de ventas</span>
+      </a>
+      <a href="dashboard.html" class="menu-item active">
+        <span class="menu-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+    </nav>
+  </aside>
+
+  <div id="menu-overlay" class="menu-overlay"></div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="app-shell">
+    <section class="page-header">
+      <div>
+        <h1>Dashboard</h1>
+        <p class="subtitle">Resumen de la operación de la salteñería.</p>
+      </div>
+    </section>
+
+    <section class="dashboard-layout" aria-label="Panel de indicadores">
+
+      <!-- TARJETAS DE INDICADORES (KPI) -->
+      <div class="kpi-grid">
+
+        <div class="panel kpi-card">
+  <span class="kpi-icon">💰</span>
+  <div class="kpi-body">
+    <p class="kpi-title">
+      Ventas del día:
+      <strong id="kpi-ventas-hoy" class="kpi-value">Bs 0,00</strong>
+    </p>
+    <p id="kpi-ventas-hoy-sub" class="kpi-sub">Cargando...</p>
+  </div>
+</div>
+
+        <div class="panel kpi-card">
+  <span class="kpi-icon">🧾</span>
+  <div class="kpi-body">
+    <p class="kpi-title">
+      Pedidos del día:
+      <strong id="kpi-pedidos-hoy" class="kpi-value">0</strong>
+    </p>
+    <p class="kpi-sub">Comprobantes registrados hoy</p>
+  </div>
+</div>
+
+        <div class="panel kpi-card">
+  <span class="kpi-icon">🥇</span>
+  <div class="kpi-body">
+    <p class="kpi-title">
+      Producto más pedido:
+      <strong id="kpi-producto-top" class="kpi-value">Sin datos</strong>
+    </p>
+    <p id="kpi-producto-top-sub" class="kpi-sub">Unidades solicitadas hoy</p>
+  </div>
+</div>
+
+        <div class="panel kpi-card payment-breakdown-card">
+          <p class="kpi-label">Ventas por método de pago (hoy)</p>
+          <div id="payment-breakdown" class="payment-breakdown">
+            <p class="empty-state">Cargando...</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- GRÁFICOS -->
+      <div class="charts-grid">
+
+        <div class="panel chart-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>Ventas de los últimos días</h2>
+              <p>Total facturado por día, últimos 7 días.</p>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="sales-trend-chart" aria-label="Gráfico de ventas de los últimos días" role="img"></canvas>
+          </div>
+        </div>
+
+        <div class="panel chart-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>Productos más vendidos</h2>
+              <p>Unidades vendidas, últimos 30 días.</p>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="top-products-chart" aria-label="Gráfico de productos más vendidos" role="img"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <p id="dashboard-feedback" class="order-feedback" role="status" aria-live="polite"></p>
+
+    </section>
+  </main>
+
+  <script src="assets/chart.umd.min.js"></script>
+  <script src="config.js"></script>
+  <script src="menu.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

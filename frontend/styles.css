@@ -803,12 +803,194 @@ input:focus, select:focus { outline: 3px solid #95b6a955; border-color: var(--tu
 .invoice-item span:not(:first-child) { text-align: right; }
 
 /* =========================================
+   DASHBOARD
+========================================= */
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 40px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.payment-breakdown-card {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+}
+
+.kpi-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+}
+
+.kpi-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: #95b6a933;
+  border-radius: 12px;
+  font-size: 1.3rem;
+}
+
+.kpi-body { min-width: 0; }
+
+.kpi-label {
+  margin: 0 0 4px;
+  color: #4A3321cc;
+  font-family: Arial, sans-serif;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.kpi-title {
+  margin: 0;
+  color: #4A3321cc;
+  font-family: Arial, sans-serif;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.kpi-title .kpi-value {
+  display: inline;
+  margin-left: 4px;
+  color: var(--brown);
+  font-family: Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
+
+.kpi-value {
+  display: block;
+  color: var(--brown);
+  font-family: Georgia, serif;
+  font-size: 1.55rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kpi-sub {
+  margin: 4px 0 0;
+  color: #4A3321a8;
+  font-family: Arial, sans-serif;
+  font-size: .76rem;
+}
+
+/* Tarjeta de método de pago */
+.payment-breakdown-card {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.payment-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.payment-row { display: flex; flex-direction: column; gap: 6px; }
+
+.payment-row-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Arial, sans-serif;
+}
+
+.payment-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.payment-method-name {
+  flex: 1;
+  color: var(--brown);
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+.payment-amount {
+  color: var(--brown);
+  font-size: .88rem;
+  white-space: nowrap;
+}
+
+.payment-count {
+  color: #4A3321a8;
+  font-size: .72rem;
+  font-weight: 400;
+}
+
+.payment-bar-track {
+  height: 8px;
+  background: #eee3d9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.payment-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width .4s ease;
+}
+
+/* Gráficos */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.chart-panel {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 320px;
+}
+
+.chart-canvas-wrapper canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* =========================================
    RESPONSIVE (ADAPTACIÓN A MÓVILES)
 ========================================= */
 @media (max-width: 850px) {
   .sales-layout { flex-direction: column; }
   .sidebar-column { width: 100%; }
   .order-panel { width: 100%; min-height: 480px; height: auto; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto; }
+  .payment-breakdown-card { grid-column: 1 / -1; grid-row: auto; }
+  .charts-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 560px) {
@@ -823,6 +1005,9 @@ input:focus, select:focus { outline: 3px solid #95b6a955; border-color: var(--tu
   .history-header { display: none; }
   .history-row { grid-template-columns: 1fr 1fr; gap: 8px; }
   .history-view-button { justify-self: start; }
+  .kpi-grid { grid-template-columns: 1fr; }
+  .payment-breakdown-card { grid-column: auto; grid-row: auto; }
+  .chart-canvas-wrapper { min-height: 240px; }
 }
 
 /* =========================================
