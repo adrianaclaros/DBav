@@ -1,21 +1,48 @@
+// ==========================================
+// CONFIGURACIÓN E INICIALIZACIÓN
+// ==========================================
 const API_BASE_URL = window.APP_CONFIG.API_BASE_URL;
 
+// Elementos del DOM para usuario y navegación
 const userEmail = document.querySelector('#user-email');
 const logoutButton = document.querySelector('#logout-button');
 const historyList = document.querySelector('#sales-history-list');
 const historySummary = document.querySelector('#history-summary');
 
-// Referencias del formulario de filtros
+// Elementos del DOM para filtros y búsquedas
 const filterForm = document.querySelector('#sales-filter-form');
+const filterModeRadios = document.querySelectorAll('input[name="filter-mode"]');
+const periodOptions = document.querySelector('#period-options');
+const rangeOptions = document.querySelector('#range-options');
+
 const searchQueryInput = document.querySelector('#search-query');
+const filterPaymentMethodSelect = document.querySelector('#filter-payment-method');
+const filterTypeSelect = document.querySelector('#filter-type');
+const filterSuboptions = document.querySelectorAll('.filter-suboptions');
+
+// Subopciones de período de tiempo
+const selectDia = document.querySelector('#select-dia');
+const dateSpecificDay = document.querySelector('#date-specific-day');
+
+const selectSemana = document.querySelector('#select-semana');
+const dateSpecificWeek = document.querySelector('#date-specific-week');
+
+const selectMes = document.querySelector('#select-mes');
+const inputMonth = document.querySelector('#input-month');
+
+const selectAno = document.querySelector('#select-ano');
+const inputYear = document.querySelector('#input-year');
+
 const dateFromInput = document.querySelector('#date-from');
 const dateToInput = document.querySelector('#date-to');
 const clearFiltersButton = document.querySelector('#clear-filters');
 
+// Elementos del Modal de Factura / Comprobante
 const invoiceModal = document.querySelector('#invoice-modal');
 const invoiceOverlay = document.querySelector('#invoice-overlay');
 const closeInvoiceButton = document.querySelector('#close-invoice');
 const printInvoiceButton = document.querySelector('#print-invoice');
+
 const invoiceItems = document.querySelector('#invoice-items');
 const invoiceTotal = document.querySelector('#invoice-total');
 const invoiceOrderNumber = document.querySelector('#invoice-order-number');
@@ -24,6 +51,16 @@ const invoicePaymentMethod = document.querySelector('#invoice-payment-method');
 const invoiceNit = document.querySelector('#invoice-nit');
 const invoiceBusinessName = document.querySelector('#invoice-business-name');
 
+// Temporizador para el debounce de la búsqueda en tiempo real
+let searchDebounceTimer = null;
+
+// ==========================================
+// FUNCIONES UTILITARIAS
+// ==========================================
+
+/**
+ * Formatea un monto numérico a formato de moneda Boliviana (BOB).
+ */
 function formatCurrency(amount) {
   return new Intl.NumberFormat('es-BO', {
     style: 'currency',
@@ -31,6 +68,9 @@ function formatCurrency(amount) {
   }).format(Number(amount));
 }
 
+/**
+ * Escapa caracteres HTML para evitar vulnerabilidades XSS.
+ */
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -40,12 +80,18 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+/**
+ * Lee la respuesta HTTP en JSON e identifica errores de servidor.
+ */
 async function readResponse(response) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.message || 'No se pudo completar la solicitud.');
   return data;
 }
 
+/**
+ * Convierte fecha y hora en formato legible localizado para Bolivia.
+ */
 function formatDateTime(fecha, hora) {
   const date = String(fecha).slice(0, 10);
   const time = String(hora).slice(0, 8);
@@ -59,10 +105,174 @@ function formatDateTime(fecha, hora) {
   });
 }
 
+// ==========================================
+// CONTROL DE VISIBILIDAD DE FILTROS
+// ==========================================
+
+/**
+ * Actualiza la visibilidad de las opciones según el modo seleccionado (periodo o rango).
+ */
+function updateFilterMode() {
+  const selectedMode = document.querySelector('input[name="filter-mode"]:checked')?.value;
+
+  periodOptions?.setAttribute('hidden', 'true');
+  rangeOptions?.setAttribute('hidden', 'true');
+
+  if (selectedMode === 'period') {
+    periodOptions?.removeAttribute('hidden');
+    updatePeriodOptions();
+  } else if (selectedMode === 'range') {
+    rangeOptions?.removeAttribute('hidden');
+  }
+}
+
+/**
+ * Muestra el grupo de opciones específico para Día, Semana, Mes o Año.
+ */
+function updatePeriodOptions() {
+  const selectedType = filterTypeSelect?.value;
+  filterSuboptions.forEach((section) => section.setAttribute('hidden', 'true'));
+
+  if (!selectedType) return;
+  const selectedOption = document.querySelector(`#option-${selectedType}`);
+  if (selectedOption) selectedOption.removeAttribute('hidden');
+}
+
+/**
+ * Muestra u oculta selectores adicionales cuando la opción seleccionada es "Otro" (custom).
+ */
+function updateSuboptionsVisibility() {
+  if (selectDia) dateSpecificDay.hidden = selectDia.value !== 'custom';
+  if (selectSemana) dateSpecificWeek.hidden = selectSemana.value !== 'custom';
+  if (selectMes) inputMonth.hidden = selectMes.value !== 'custom';
+  if (selectAno) inputYear.hidden = selectAno.value !== 'custom';
+}
+
+// ==========================================
+// CONSTRUCCIÓN DE PARÁMETROS Y PETICIONES API
+// ==========================================
+
+/**
+ * Construye la URLSearchParams leyendo el estado actual de los inputs del DOM.
+ */
+function buildFilterParams() {
+  const params = new URLSearchParams();
+
+  // 1. Búsqueda por texto (query)
+  const query = searchQueryInput?.value.trim();
+  if (query) params.append('q', query);
+
+  // 2. Filtro por Método de Pago
+  const paymentMethod = filterPaymentMethodSelect?.value;
+  if (paymentMethod && paymentMethod !== 'todos') {
+    params.append('metodo_pago', paymentMethod);
+  }
+
+  const selectedMode = document.querySelector('input[name="filter-mode"]:checked')?.value;
+
+  // 3. Filtro por Período
+  if (selectedMode === 'period') {
+    const type = filterTypeSelect?.value;
+    if (type) {
+      params.append('type', type);
+
+      if (type === 'dia') {
+        const mode = selectDia?.value;
+        if (mode) params.append('mode', mode);
+        if (mode === 'custom' && dateSpecificDay?.value) {
+          params.append('date', dateSpecificDay.value);
+        }
+      } else if (type === 'semana') {
+        const mode = selectSemana?.value;
+        if (mode) params.append('mode', mode);
+        if (mode === 'custom' && dateSpecificWeek?.value) {
+          params.append('date', dateSpecificWeek.value);
+        }
+      } else if (type === 'mes') {
+        const mode = selectMes?.value;
+        if (mode) params.append('mode', mode);
+        if (mode === 'custom' && inputMonth?.value) {
+          params.append('month', inputMonth.value);
+        }
+      } else if (type === 'ano') {
+        const mode = selectAno?.value;
+        if (mode) params.append('mode', mode);
+        if (mode === 'custom' && inputYear?.value) {
+          params.append('year', inputYear.value);
+        }
+      }
+    }
+  }
+
+  // 4. Filtro por Rango
+  if (selectedMode === 'range') {
+    params.append('type', 'rango');
+    if (dateFromInput?.value) params.append('from', dateFromInput.value);
+    if (dateToInput?.value) params.append('to', dateToInput.value);
+  }
+
+  return params;
+}
+
+/**
+ * Realiza la petición a la API backend para cargar la lista de ventas.
+ */
+async function loadSales() {
+  const token = localStorage.getItem('authToken');
+  if (!token) return window.location.replace('index.html');
+
+  historyList.innerHTML = '<p class="empty-state">Cargando ventas...</p>';
+
+  const params = buildFilterParams();
+  const queryString = params.toString();
+  const url = queryString ? `${API_BASE_URL}/ventas?${queryString}` : `${API_BASE_URL}/ventas`;
+
+  try {
+    const data = await readResponse(
+      await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    );
+
+    const sales = data.ventas || [];
+    historySummary.textContent = sales.length
+      ? `${sales.length} venta${sales.length === 1 ? '' : 's'} encontrada${sales.length === 1 ? '' : 's'}`
+      : 'No hay ventas registradas que coincidan con los filtros.';
+
+    if (!sales.length) {
+      historyList.innerHTML = '<p class="empty-state">No hay comprobantes para mostrar.</p>';
+      return;
+    }
+
+    historyList.innerHTML = sales.map((venta) => `
+      <div class="history-row">
+        <strong>#${String(venta.Venta_ID).padStart(3, '0')}</strong>
+        <span>${escapeHtml(formatDateTime(venta.Fecha, venta.Hora))}</span>
+        <span>${escapeHtml(venta.Metodo_Pago)}</span>
+        <strong>${formatCurrency(venta.Total)}</strong>
+        <button type="button" class="history-view-button" data-sale-id="${venta.Venta_ID}">
+          Ver factura
+        </button>
+      </div>
+    `).join('');
+  } catch (error) {
+    historySummary.textContent = 'No se pudo cargar el historial.';
+    historyList.innerHTML = `<p class="empty-state">${escapeHtml(error.message || 'Error al cargar las ventas.')}</p>`;
+  }
+}
+
+// ==========================================
+// COMPROBANTE Y MODAL
+// ==========================================
+
+/**
+ * Llena el modal con la información detallada del comprobante y lo hace visible.
+ */
 function showInvoice(venta, items) {
   invoiceOrderNumber.textContent = `#${String(venta.Venta_ID).padStart(3, '0')}`;
   invoiceDate.textContent = formatDateTime(venta.Fecha, venta.Hora);
 
+  // Inyección con las clases exactas para la rejilla de 4 columnas
   invoiceItems.innerHTML = items.map((item) => `
     <div class="invoice-item">
       <span class="invoice-item-name">${escapeHtml(item.Nombre)}</span>
@@ -75,17 +285,21 @@ function showInvoice(venta, items) {
   invoiceTotal.textContent = formatCurrency(venta.Total);
   invoicePaymentMethod.textContent = venta.Metodo_Pago;
   invoiceNit.textContent = venta.NIT && venta.NIT !== '0' ? venta.NIT : '—';
-  invoiceBusinessName.textContent = venta.Razon_Social && venta.Razon_Social !== 'Sin Nombre'
-    ? venta.Razon_Social
-    : '—';
+  invoiceBusinessName.textContent = venta.Razon_Social && venta.Razon_Social !== 'Sin Nombre' ? venta.Razon_Social : '—';
 
   invoiceModal.removeAttribute('hidden');
 }
 
+/**
+ * Cierra el modal del comprobante.
+ */
 function closeInvoice() {
   invoiceModal.setAttribute('hidden', 'true');
 }
 
+/**
+ * Solicita los detalles completos de una venta por ID.
+ */
 async function loadInvoice(id) {
   const token = localStorage.getItem('authToken');
   if (!token) return window.location.replace('index.html');
@@ -102,92 +316,9 @@ async function loadInvoice(id) {
   }
 }
 
-async function loadSales() {
-  const token = localStorage.getItem('authToken');
-
-  if (!token) {
-    return window.location.replace('index.html');
-  }
-
-  historyList.innerHTML =
-    '<p class="empty-state">Cargando ventas...</p>';
-
-  const params = buildFilterParams();
-
-  const queryString = params.toString();
-
-  const url = queryString
-    ? `${API_BASE_URL}/ventas?${queryString}`
-    : `${API_BASE_URL}/ventas`;
-
-  try {
-    const data = await readResponse(
-      await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-    );
-
-    const sales = data.ventas || [];
-
-    historySummary.textContent = sales.length
-      ? `${sales.length} venta${sales.length === 1 ? '' : 's'} encontrada${sales.length === 1 ? '' : 's'}`
-      : 'No hay ventas registradas que coincidan con los filtros.';
-
-    if (!sales.length) {
-      historyList.innerHTML =
-        '<p class="empty-state">No hay comprobantes para mostrar.</p>';
-      return;
-    }
-
-    historyList.innerHTML = sales.map((venta) => `
-      <div class="history-row">
-
-        <strong>
-          #${String(venta.Venta_ID).padStart(3, '0')}
-        </strong>
-
-        <span>
-          ${escapeHtml(
-            formatDateTime(venta.Fecha, venta.Hora)
-          )}
-        </span>
-
-        <span>
-          ${escapeHtml(venta.Metodo_Pago)}
-        </span>
-
-        <strong>
-          ${formatCurrency(venta.Total)}
-        </strong>
-
-        <button
-          type="button"
-          class="history-view-button"
-          data-sale-id="${venta.Venta_ID}"
-        >
-          Ver factura
-        </button>
-
-      </div>
-    `).join('');
-
-  } catch (error) {
-
-    historySummary.textContent =
-      'No se pudo cargar el historial.';
-
-    historyList.innerHTML = `
-      <p class="empty-state">
-        ${escapeHtml(
-          error.message || 'Error al cargar las ventas.'
-        )}
-      </p>
-    `;
-  }
-}
-
+/**
+ * Valida la autenticación del usuario activo.
+ */
 async function validateSession() {
   const token = localStorage.getItem('authToken');
   if (!token) return window.location.replace('index.html');
@@ -198,7 +329,7 @@ async function validateSession() {
         headers: { Authorization: `Bearer ${token}` }
       })
     );
-    userEmail.textContent = data.user.email;
+    if (userEmail) userEmail.textContent = data.user.email;
     await loadSales();
   } catch (_error) {
     localStorage.removeItem('authToken');
@@ -206,173 +337,67 @@ async function validateSession() {
   }
 }
 
-// Event Listeners para filtrado
-filterForm.addEventListener('submit', (event) => {
+// ==========================================
+// EVENT LISTENERS
+// ==========================================
+
+// Búsqueda en tiempo real con efecto debounce (300ms)
+searchQueryInput?.addEventListener('input', () => {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    loadSales();
+  }, 300);
+});
+
+// Actualización inmediata al cambiar de método de pago
+filterPaymentMethodSelect?.addEventListener('change', () => {
+  loadSales();
+});
+
+filterModeRadios.forEach((radio) => radio.addEventListener('change', updateFilterMode));
+filterTypeSelect?.addEventListener('change', updatePeriodOptions);
+
+[selectDia, selectSemana, selectMes, selectAno].forEach((select) => {
+  select?.addEventListener('change', updateSuboptionsVisibility);
+});
+
+filterForm?.addEventListener('submit', (event) => {
   event.preventDefault();
   loadSales();
 });
 
-clearFiltersButton.addEventListener('click', () => {
-  filterForm.reset();
+// Limpieza de filtros y reseteo de la vista
+clearFiltersButton?.addEventListener('click', () => {
+  filterForm?.reset();
+  if (searchQueryInput) searchQueryInput.value = '';
+  if (filterPaymentMethodSelect) filterPaymentMethodSelect.value = 'todos';
+
+  const allRadio = document.querySelector('#filter-all');
+  if (allRadio) allRadio.checked = true;
+
+  updateFilterMode();
+  updatePeriodOptions();
+  updateSuboptionsVisibility();
   loadSales();
 });
 
+// Delegación de eventos para los botones de ver factura
 historyList.addEventListener('click', (event) => {
   const button = event.target.closest('[data-sale-id]');
   if (button) loadInvoice(button.dataset.saleId);
 });
 
-closeInvoiceButton.addEventListener('click', closeInvoice);
-invoiceOverlay.addEventListener('click', closeInvoice);
-printInvoiceButton.addEventListener('click', () => window.print());
+closeInvoiceButton?.addEventListener('click', closeInvoice);
+invoiceOverlay?.addEventListener('click', closeInvoice);
+printInvoiceButton?.addEventListener('click', () => window.print());
 
+// Cerrar el comprobante mediante la tecla Escape
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') closeInvoice();
 });
 
+// Inicializar la vista
+updateFilterMode();
+updatePeriodOptions();
+updateSuboptionsVisibility();
 validateSession();
-
-// Referencias de los elementos del filtro
-const filterTypeSelect = document.querySelector('#filter-type');
-const filterSuboptions = document.querySelectorAll('.filter-suboptions');
-
-const selectDia = document.querySelector('#select-dia');
-const dateSpecificDay = document.querySelector('#date-specific-day');
-
-const selectSemana = document.querySelector('#select-semana');
-const dateSpecificWeek = document.querySelector('#date-specific-week');
-
-const selectMes = document.querySelector('#select-mes');
-const inputMonth = document.querySelector('#input-month');
-
-const selectAno = document.querySelector('#select-ano');
-const inputYear = document.querySelector('#input-year');
-
-selectMes.addEventListener('change', () => {
-  if (selectMes.value === 'custom') {
-    inputMonth.removeAttribute('hidden');
-  } else {
-    inputMonth.setAttribute('hidden', 'true');
-    inputMonth.value = '';
-  }
-});
-
-selectAno.addEventListener('change', () => {
-  if (selectAno.value === 'custom') {
-    inputYear.removeAttribute('hidden');
-
-    if (!inputYear.value) {
-      inputYear.value = new Date().getFullYear();
-    }
-  } else {
-    inputYear.setAttribute('hidden', 'true');
-    inputYear.value = '';
-  }
-});
-
-// Alternar bloques visibles según el tipo de filtro seleccionado
-filterTypeSelect.addEventListener('change', () => {
-  const selectedType = filterTypeSelect.value;
-  
-  filterSuboptions.forEach(sub => sub.setAttribute('hidden', 'true'));
-  
-  const activeSuboption = document.querySelector(`#option-${selectedType}`);
-  if (activeSuboption) {
-    activeSuboption.removeAttribute('hidden');
-  }
-});
-
-// Mostrar/Ocultar campos de fecha específica dentro de Día y Semana
-selectDia.addEventListener('change', () => {
-  if (selectDia.value === 'custom') {
-    dateSpecificDay.removeAttribute('hidden');
-  } else {
-    dateSpecificDay.setAttribute('hidden', 'true');
-  }
-});
-
-selectSemana.addEventListener('change', () => {
-  if (selectSemana.value === 'custom') {
-    dateSpecificWeek.removeAttribute('hidden');
-  } else {
-    dateSpecificWeek.setAttribute('hidden', 'true');
-  }
-});
-
-// Construir parámetros para enviar al backend en loadSales()
-function buildFilterParams() {
-  const params = new URLSearchParams();
-
-  const query = searchQueryInput.value.trim();
-
-  if (query) {
-    params.append('q', query);
-  }
-
-  const type = filterTypeSelect.value;
-
-  params.append('type', type);
-
-  // TODAS LAS FECHAS
-  if (type === 'todos') {
-    return params;
-  }
-
-  // DÍA
-  if (type === 'dia') {
-    const val = selectDia.value;
-
-    params.append('mode', val);
-
-    if (val === 'custom' && dateSpecificDay.value) {
-      params.append('date', dateSpecificDay.value);
-    }
-  }
-
-  // SEMANA
-  else if (type === 'semana') {
-    const val = selectSemana.value;
-
-    params.append('mode', val);
-
-    if (val === 'custom' && dateSpecificWeek.value) {
-      params.append('date', dateSpecificWeek.value);
-    }
-  }
-
-  // MES
-  else if (type === 'mes') {
-    const selectMes = document.querySelector('#select-mes');
-    const monthInput = document.querySelector('#input-month');
-
-    if (selectMes.value === 'custom' && monthInput.value) {
-      params.append('month', monthInput.value);
-    }
-  }
-
-  // AÑO
-  else if (type === 'ano') {
-    const selectAno = document.querySelector('#select-ano');
-    const yearInput = document.querySelector('#input-year');
-
-    if (selectAno.value === 'custom' && yearInput.value) {
-      params.append('year', yearInput.value);
-    }
-  }
-
-  // RANGO
-  else if (type === 'rango') {
-    const from = dateFromInput.value;
-    const to = dateToInput.value;
-
-    if (from) {
-      params.append('from', from);
-    }
-
-    if (to) {
-      params.append('to', to);
-    }
-  }
-
-  return params;
-}
