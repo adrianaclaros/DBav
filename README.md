@@ -1,10 +1,43 @@
 # Salteñas Intiña
 
-Aplicacion full stack para la salteñeria Salteñas Intiña. El proyecto incorpora autenticacion de usuarios para el proceso de registro de pedidos de mostrador, cuyo modelo de datos existente contempla productos, ventas y sus detalles.
+Aplicación web full stack para la gestión de pedidos y ventas de la salteñería Intiña.
+
+El sistema está orientado al proceso de atención en mostrador y permite registrar pedidos, gestionar productos disponibles, registrar ventas y consultar posteriormente el historial de comprobantes.
+
+El proyecto utiliza una arquitectura separada entre **frontend, backend y base de datos MySQL**, incorporando autenticación de usuarios mediante JWT (JSON Web Token).
 
 ## Estudiante
 
 Adriana Guadalupe Claros Salazar
+
+## Descripción del proyecto
+
+La aplicación permite al personal de mostrador registrar los pedidos de los clientes y completar el proceso de venta.
+
+Entre las principales funciones se encuentran:
+
+- Inicio de sesión de usuarios.
+- Autenticación mediante JWT.
+- Registro de pedidos de mostrador.
+- Selección de productos y cantidades.
+- Selección del método de pago.
+- Registro opcional de NIT y razón social.
+- Validación de stock antes de registrar una venta.
+- Descuento automático del stock después de una venta.
+- Consulta del historial de ventas.
+- Búsqueda de ventas por número de pedido, NIT o razón social.
+- Filtrado de ventas por:
+  - Día.
+  - Semana.
+  - Mes.
+  - Año.
+  - Rango de fechas.
+  - Método de pago.
+- Consulta del comprobante de cada venta.
+- Visualización de los productos, cantidades, precios y total del comprobante.
+- Opción de impresión del comprobante.
+- Cierre de sesión.
+- Menú lateral de navegación entre las diferentes secciones del sistema.
 
 ## Stack tecnico
 
@@ -49,7 +82,8 @@ cd backend
 npm run dev
 ```
 
-El backend queda disponible en `http://localhost:3307` de forma predeterminada.
+El backend se ejecuta en el puerto configurado mediante la variable PORT del archivo `.env`.
+Por ejemplo: `http://localhost:3000`
 
 En otra terminal:
 
