@@ -10,10 +10,13 @@ CREATE TABLE IF NOT EXISTS `Usuario` (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
--- Usuario de prueba: contraseña 123456 (hash bcrypt de 60 caracteres).
--- La condición evita duplicarlo si el script se ejecuta más de una vez.
+-- Usuario de prueba: contraseña ad123456 (hash bcrypt de 60 caracteres).
+-- No sobreescribe una contraseña existente. Solo corrige el hash de prueba
+-- incorrecto que se distribuyó en una versión anterior de esta migración.
 INSERT INTO `Usuario` (`email`, `password_hash`)
-SELECT 'admin@saltenieria.com', '$2a$12$GeQ7EKkHT5M.4ZCYpZaf6uGWFdaoxv.zOyyaTnu.1H33gt3lbwdwq'
-WHERE NOT EXISTS (
-  SELECT 1 FROM `Usuario` WHERE `email` = 'admin@saltenieria.com'
-);
+VALUES ('admin@saltenieria.com', '$2a$12$.eVx1HVCk8HyhLrZ64ACFuiZckcgUa108N8mzoviWYG.aiRCG9eq6')
+ON DUPLICATE KEY UPDATE `password_hash` = CASE
+  WHEN `password_hash` = '$2a$12$GeQ7EKkHT5M.4ZCYpZaf6uGWFdaoxv.zOyyaTnu.1H33gt3lbwdwq'
+    THEN VALUES(`password_hash`)
+  ELSE `password_hash`
+END;

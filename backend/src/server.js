@@ -8,5 +8,5 @@ if (missing.length > 0) {
   throw new Error(`Faltan variables de entorno requeridas: ${missing.join(', ')}`);
 }
 
-const port = Number(process.env.PORT || 3307);
+const port = Number(process.env.PORT || 3000);
 app.listen(port, () => console.log(`Backend disponible en http://localhost:${port}`));

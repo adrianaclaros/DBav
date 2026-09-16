@@ -314,7 +314,7 @@ async function loadNextOrderNumber() {
 
   try {
     const data = await readResponse(
-      await fetch(`${API_BASE_URL}/ventas?range=ano`, {
+      await fetch(`${API_BASE_URL}/ventas?type=ano`, {
         headers: { Authorization: `Bearer ${token}` }
       })
     );

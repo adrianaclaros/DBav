@@ -1,10 +1,4 @@
-# Salteñas Intiña
-
-Aplicación web full stack para la gestión de pedidos y ventas de la salteñería Intiña.
-
-El sistema está orientado al proceso de atención en mostrador y permite registrar pedidos, gestionar productos disponibles, registrar ventas y consultar posteriormente el historial de comprobantes.
-
-El proyecto utiliza una arquitectura separada entre **frontend, backend y base de datos MySQL**, incorporando autenticación de usuarios mediante JWT (JSON Web Token).
+# Salteñas Cuzque
 
 ## Estudiante
 
@@ -61,17 +55,19 @@ cd backend && npm install
 cd ../frontend && npm install
 ```
 
-## Base de datos y migracion segura
+## Base de datos y migración segura
 
-El archivo SQL principal es `Saltenieria_nueva.sql`. Es una exportacion de la base `Saltenieria` que define las tablas `Producto`, `Venta` y `DetalleVenta`, sus claves foraneas y las vistas de consulta. Contiene `DROP TABLE`, por lo que **no debe ejecutarse sobre una base de datos existente con informacion que se desea conservar**.
+El archivo SQL principal es `Saltenieria_nueva.sql`. Es un script de reconstrucción de la base `Saltenieria`; contiene las tablas `Producto` (incluido `Stock`), `Usuario`, `Venta` y `DetalleVenta`, sus claves foráneas y las vistas `v_productos_disponibles`, `v_registro_venta`, `v_resumen_ventas`, `v_transacciones_qr` y `v_reporte_ventas_producto`. Contiene sentencias `DROP`, por lo que **no debe ejecutarse sobre una base existente con información que se desea conservar**.
 
-La autenticacion se agrega con la migracion no destructiva `backend/sql/migrations/01_create_usuario.sql`. La exportacion original no contiene una tabla `Usuario` ni una equivalente. Ajuste usuario, host y puerto a su instalacion:
+Para una base nueva, ejecute primero el script principal y luego la migración de usuario de prueba. Para la base existente, ejecute únicamente la migración no destructiva `backend/sql/migrations/01_create_usuario.sql`; no altera `Producto`, `Venta`, `DetalleVenta` ni las vistas.
 
 ```bash
+mysql -u TU_USUARIO -p -h TU_HOST -P 3307 < Saltenieria_nueva.sql
+mysql -u TU_USUARIO -p -h TU_HOST -P 3307 Saltenieria < backend/sql/seeds/02_seed_productos.sql
 mysql -u TU_USUARIO -p -h TU_HOST -P 3307 Saltenieria < backend/sql/migrations/01_create_usuario.sql
 ```
 
-La migracion solo crea `Usuario` si no existe y no modifica las tablas, vistas ni datos actuales. Si en la instancia real ya existe una tabla llamada `Usuario` con otro proposito o sin las columnas requeridas, no ejecute cambios automaticos: inspeccione primero `DESCRIBE Usuario;` y defina una migracion de adaptacion antes de continuar. El nombre de la base debe coincidir con `DB_NAME` en `.env`.
+El seed `02_seed_productos.sql` agrega un catálogo demostrativo de 16 productos con `INSERT IGNORE`; no sobrescribe productos ya existentes. La migración solo crea `Usuario` si no existe y no modifica las tablas, vistas ni datos actuales. Si en la instancia real ya existe una tabla llamada `Usuario` con otro propósito o sin las columnas requeridas, no ejecute cambios automáticos: inspeccione primero `DESCRIBE Usuario;` y defina una migración de adaptación antes de continuar. El nombre de la base debe coincidir con `DB_NAME` en `.env`.
 
 ## Ejecutar el backend y frontend
 
@@ -82,8 +78,12 @@ cd backend
 npm run dev
 ```
 
+<<<<<<< HEAD
 El backend se ejecuta en el puerto configurado mediante la variable PORT del archivo `.env`.
 Por ejemplo: `http://localhost:3000`
+=======
+El backend queda disponible en `http://localhost:3000` de forma predeterminada. El puerto `3307` corresponde a MySQL en esta configuración, no al backend Express.
+>>>>>>> bab4ce3 (Finaliza autenticacion ventas y documentacion)
 
 En otra terminal:
 
@@ -99,13 +99,13 @@ Abra la URL indicada por el servidor del frontend (por defecto `http://localhost
 Estado de la aplicacion y conexion real a MySQL:
 
 ```bash
-curl http://localhost:3307/api/health
+curl http://localhost:3000/api/health
 ```
 
 Registro:
 
 ```bash
-curl -X POST http://localhost:3307/api/auth/register \
+curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"usuario@ejemplo.com","password":"UnaClaveSegura123"}'
 ```
@@ -113,19 +113,28 @@ curl -X POST http://localhost:3307/api/auth/register \
 Inicio de sesion (copie el `token` devuelto):
 
 ```bash
-curl -X POST http://localhost:3307/api/auth/login \
+curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"usuario@ejemplo.com","password":"UnaClaveSegura123"}'
 ```
 
-La migracion crea el usuario de prueba `admin@saltenieria.com` con la contrasena `123456`. Se recomienda cambiarla o eliminarlo antes de usar el sistema fuera de desarrollo.
+La migración crea el usuario de prueba `admin@saltenieria.com` con la contraseña `ad123456`. Se recomienda cambiarla o eliminarlo antes de usar el sistema fuera de desarrollo.
 
 Perfil protegido:
 
 ```bash
-curl http://localhost:3307/api/auth/me \
+curl http://localhost:3000/api/auth/me \
   -H "Authorization: Bearer TU_TOKEN"
 ```
+
+Productos disponibles, con el stock actual:
+
+```bash
+curl http://localhost:3000/api/productos \
+  -H "Authorization: Bearer TU_TOKEN"
+```
+
+La interfaz usa además los endpoints protegidos `POST /api/ventas`, `GET /api/ventas` y `GET /api/dashboard` para registrar ventas, consultar comprobantes y mostrar indicadores y gráficos.
 
 ## Estructura
 
@@ -133,6 +142,7 @@ curl http://localhost:3307/api/auth/me \
 backend/
   src/config, src/controllers, src/middleware, src/routes
   sql/migrations/01_create_usuario.sql
+  sql/seeds/02_seed_productos.sql
 frontend/
   index.html, styles.css, app.js, config.js
 ```

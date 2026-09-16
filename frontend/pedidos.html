@@ -253,7 +253,7 @@
           <img src="assets/imagotipo.png" alt="Intiña" class="invoice-logo" />
           <div>
             <h2 id="invoice-title">SALTEÑERÍA INTIÑA</h2>
-            <p>Comprobante de venta</p>
+            <p class="invoice-subtitle">Comprobante de venta</p>
           </div>
         </div>
         
@@ -261,12 +261,12 @@
         
         <div class="invoice-info">
           <div>
-            <span>Pedido</span>
-            <strong id="invoice-order-number">#001</strong>
+            <span class="invoice-label">PEDIDO</span>
+            <strong id="invoice-order-number" class="invoice-value">#001</strong>
           </div>
           <div>
-            <span>Fecha</span>
-            <strong id="invoice-date"></strong>
+            <span class="invoice-label">FECHA</span>
+            <strong id="invoice-date" class="invoice-value"></strong>
           </div>
         </div>
         
@@ -282,28 +282,28 @@
         <div id="invoice-items" class="invoice-items"></div>
         
         <div class="invoice-total">
-          <span>TOTAL</span>
-          <strong id="invoice-total">Bs 0,00</strong>
+          <span class="invoice-total-label">TOTAL</span>
+          <strong id="invoice-total" class="invoice-total-value">Bs 0,00</strong>
         </div>
         
         <div class="invoice-payment">
-          <p>
-            <span>Método de pago</span>
-            <strong id="invoice-payment-method">Efectivo</strong>
-          </p>
-          <p>
-            <span>NIT</span>
-            <strong id="invoice-nit">—</strong>
-          </p>
-          <p>
-            <span>Razón social</span>
-            <strong id="invoice-business-name">—</strong>
-          </p>
+          <div class="invoice-payment-row">
+            <span class="invoice-label">Método de pago</span>
+            <strong id="invoice-payment-method" class="invoice-value">Efectivo</strong>
+          </div>
+          <div class="invoice-payment-row">
+            <span class="invoice-label">NIT / CI</span>
+            <strong id="invoice-nit" class="invoice-value">—</strong>
+          </div>
+          <div class="invoice-payment-row">
+            <span class="invoice-label">Razón social</span>
+            <strong id="invoice-business-name" class="invoice-value">—</strong>
+          </div>
         </div>
         
         <div class="invoice-footer">
-          <p>¡Gracias por su compra!</p>
-          <small>Salteñería Intiña</small>
+          <p class="invoice-thanks">¡Gracias por su compra!</p>
+          <small class="invoice-brand">Salteñería Intiña</small>
         </div>
       </section>
     </div>

@@ -23,7 +23,7 @@ function publicUser(user) {
 
 async function register(req, res, next) {
   const { email, password } = req.body || {};
-  const validationError = validateCredentials(email, password, 1);
+  const validationError = validateCredentials(email, password);
   if (validationError) return res.status(400).json({ message: validationError });
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -49,7 +49,9 @@ async function register(req, res, next) {
 
 async function login(req, res, next) {
   const { email, password } = req.body || {};
-  const validationError = validateCredentials(email, password);
+  // Login only requires a non-empty password so existing bcrypt hashes with
+  // legacy passwords shorter than eight characters remain accessible.
+  const validationError = validateCredentials(email, password, 1);
   if (validationError) return res.status(400).json({ message: validationError });
 
   try {
