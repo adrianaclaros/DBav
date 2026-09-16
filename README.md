@@ -1,4 +1,4 @@
-# Salteñas Cuzque
+# Salteñería Intiña
 
 ## Estudiante
 
@@ -78,12 +78,7 @@ cd backend
 npm run dev
 ```
 
-<<<<<<< HEAD
-El backend se ejecuta en el puerto configurado mediante la variable PORT del archivo `.env`.
-Por ejemplo: `http://localhost:3000`
-=======
-El backend queda disponible en `http://localhost:3000` de forma predeterminada. El puerto `3307` corresponde a MySQL en esta configuración, no al backend Express.
->>>>>>> bab4ce3 (Finaliza autenticacion ventas y documentacion)
+El backend se ejecuta en el puerto configurado mediante la variable `PORT` del archivo `.env`; de forma predeterminada queda disponible en `http://localhost:3000`. El puerto `3307` corresponde a MySQL en esta configuración, no al backend Express.
 
 En otra terminal:
 
